@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     kb_url: str = Field(..., alias="KB_URL")
     llm_provider: str = Field("gemini", alias="LLM_PROVIDER")
     llm_model: str = Field("gemini-2.5-flash", alias="LLM_MODEL")
-    llm_api_key: str = Field(..., alias="LLM_API_KEY")
+    llm_api_key: str = Field("", alias="LLM_API_KEY")
     llm_base_url: str = Field("", alias="LLM_BASE_URL")
 
     # Retrieval and validation tuning
@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     # Optional memory store configuration
     memory_store: str = Field("", alias="MEMORY_STORE")
-    
+
     # Server configuration
     host: str = Field("0.0.0.0", alias="HOST")
     port: int = Field(8000, alias="PORT")
