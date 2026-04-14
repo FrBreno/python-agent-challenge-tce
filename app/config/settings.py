@@ -17,7 +17,8 @@ class Settings(BaseSettings):
     min_section_score: int = Field(1, alias="MIN_SECTION_SCORE")
     max_context_sections: int = Field(3, alias="MAX_CONTEXT_SECTIONS")
     kb_timeout_seconds: float = Field(10.0, alias="KB_TIMEOUT_SECONDS")
-
+    llm_timeout_seconds: float = Field(30.0, alias="LLM_TIMEOUT_SECONDS")
+    
     # Logging configuration
     log_level: str = Field("INFO", alias="LOG_LEVEL")
 

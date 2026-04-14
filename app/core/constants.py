@@ -1,4 +1,4 @@
-"""Domain constants used by the orchestration flow."""
+"""Domain constants used by orchestration."""
 
 from app.config.settings import settings
 
