@@ -1,29 +1,31 @@
 """API routes for user message handling."""
 
 import logging
+
 from fastapi import APIRouter, HTTPException
 
 from app.api.schemas import MessageRequest, MessageResponse
 from app.config.settings import settings
 from app.core.orchestrator import Orchestrator
+from app.llm.factory import build_llm_client
 from app.tools.kb_tool import KnowledgeBaseTool
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
 _kb_tool = KnowledgeBaseTool(kb_url=settings.kb_url, timeout_seconds=settings.kb_timeout_seconds)
-_orchestrator = Orchestrator(kb_tool=_kb_tool)
+_llm_client = build_llm_client()
+_orchestrator = Orchestrator(kb_tool=_kb_tool, llm_client=_llm_client)
 
 
 @router.post("/messages", response_model=MessageResponse)
 async def handle_message(request: MessageRequest) -> MessageResponse:
-    """Handle incoming user message and return answer with traceable sources."""
     logger.info("Received POST /messages request.")
     logger.debug("Request metadata: session_id_present=%s", bool(request.session_id))
     try:
         response = await _orchestrator.handle_message(
             message=request.message,
-            session_id=request.session_id
+            session_id=request.session_id,
         )
         logger.info("POST /messages completed successfully with %s source(s).", len(response.sources))
         return response
@@ -32,4 +34,4 @@ async def handle_message(request: MessageRequest) -> MessageResponse:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
         logger.error("Unexpected error while handling message: %s", exc, exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
