@@ -1,9 +1,11 @@
 """OpenAI provider client implementation."""
 
+from __future__ import annotations
+
 import logging
 from typing import Any, Dict, List
 
-from ..base import LLMClientError
+from ..base import ChatMessage, LLMClientError
 from ..system_prompt import build_openai_messages
 from .base_http_client import BaseHTTPLLMClient
 
@@ -15,7 +17,13 @@ class OpenAIClient(BaseHTTPLLMClient):
 
     provider_name = "openai"
 
-    def __init__(self, model: str, api_key: str, base_url: str = "", timeout_seconds: float = 30.0) -> None:
+    def __init__(
+        self,
+        model: str,
+        api_key: str,
+        base_url: str = "",
+        timeout_seconds: float = 30.0,
+    ) -> None:
         resolved_base_url = base_url.rstrip("/") if base_url else "https://api.openai.com/v1"
         super().__init__(
             model=model,
@@ -30,11 +38,21 @@ class OpenAIClient(BaseHTTPLLMClient):
             timeout_seconds,
         )
 
-    async def generate_answer(self, message: str, context_sections: List[Dict[str, Any]]) -> str:
+    async def generate_answer(
+        self,
+        message: str,
+        context_sections: List[Dict[str, Any]],
+        session_history: List[ChatMessage] | None = None,
+    ) -> str:
         """Generate an answer using OpenAI API."""
         self._require_api_key()
 
-        messages = build_openai_messages(message=message, context_sections=context_sections)
+        messages = build_openai_messages(
+            message=message,
+            context_sections=context_sections,
+            session_history=session_history,
+        )
+
         url = f"{self.base_url}/chat/completions"
         headers = {
             "Authorization": f"Bearer {self.api_key}",

@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException
 from app.api.schemas import MessageRequest, MessageResponse
 from app.config.settings import settings
 from app.core.orchestrator import Orchestrator
+from app.core.session_memory import SessionMemory
 from app.llm.factory import build_llm_client
 from app.tools.kb_tool import KnowledgeBaseTool
 
@@ -15,7 +16,15 @@ logger = logging.getLogger(__name__)
 
 _kb_tool = KnowledgeBaseTool(kb_url=settings.kb_url, timeout_seconds=settings.kb_timeout_seconds)
 _llm_client = build_llm_client()
-_orchestrator = Orchestrator(kb_tool=_kb_tool, llm_client=_llm_client)
+_session_memory = SessionMemory(
+    ttl_seconds=settings.session_ttl_seconds,
+    max_turns=settings.session_max_turns,
+)
+_orchestrator = Orchestrator(
+    kb_tool=_kb_tool,
+    llm_client=_llm_client,
+    session_memory=_session_memory,
+)
 
 
 @router.post("/messages", response_model=MessageResponse)

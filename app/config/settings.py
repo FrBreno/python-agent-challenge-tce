@@ -24,6 +24,8 @@ class Settings(BaseSettings):
 
     # Optional memory store configuration
     memory_store: str = Field("", alias="MEMORY_STORE")
+    session_ttl_seconds: int = Field(1800, alias="SESSION_TTL_SECONDS")
+    session_max_turns: int = Field(5, alias="SESSION_MAX_TURNS")
 
     # Server configuration
     host: str = Field("0.0.0.0", alias="HOST")
